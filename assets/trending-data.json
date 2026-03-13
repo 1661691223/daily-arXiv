@@ -1,0 +1,54 @@
+{
+  "keywords": [
+    {
+      "keyword": "agent",
+      "totalCount": 16,
+      "dailyCounts": [
+        16
+      ],
+      "dates": [
+        "2026-03-13"
+      ],
+      "changePercent": 0.0,
+      "trendType": "stable"
+    },
+    {
+      "keyword": "diffusion",
+      "totalCount": 0,
+      "dailyCounts": [
+        0
+      ],
+      "dates": [
+        "2026-03-13"
+      ],
+      "changePercent": 0.0,
+      "trendType": "stable"
+    },
+    {
+      "keyword": "transformer",
+      "totalCount": 1,
+      "dailyCounts": [
+        1
+      ],
+      "dates": [
+        "2026-03-13"
+      ],
+      "changePercent": 0.0,
+      "trendType": "stable"
+    },
+    {
+      "keyword": "llm",
+      "totalCount": 19,
+      "dailyCounts": [
+        19
+      ],
+      "dates": [
+        "2026-03-13"
+      ],
+      "changePercent": 0.0,
+      "trendType": "stable"
+    }
+  ],
+  "generatedAt": "2026-03-13T09:33:38.315128Z",
+  "daysAnalyzed": 1
+}
