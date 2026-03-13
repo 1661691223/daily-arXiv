@@ -41,8 +41,8 @@ jobs:
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
         export TOKEN_GITHUB=${{ secrets.TOKEN_GITHUB }}
-        export LANGUAGE="${{ secrets.LANGUAGE }}"
-        export CATEGORIES="${{ secrets.CATEGORIES }}"
+        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export CATEGORIES="${{ vars.CATEGORIES }}"
         export MODEL_NAME="${{ secrets.MODEL_NAME }}"
         
         # 使用Scrapy爬取
@@ -107,7 +107,7 @@ jobs:
         cd ai
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
-        export LANGUAGE="${{ secrets.LANGUAGE }}"
+        export LANGUAGE="${{ vars.LANGUAGE }}"
         export MODEL_NAME="${{ secrets.MODEL_NAME }}"
         
         python enhance.py --data ../data/${today}.jsonl
@@ -127,7 +127,7 @@ jobs:
         echo "转换为Markdown格式... / Converting to Markdown format..."
         
         # 设置环境变量 / Set environment variables
-        export LANGUAGE="${{ secrets.LANGUAGE }}"
+        export LANGUAGE="${{ vars.LANGUAGE }}"
         
         cd to_md
         
@@ -171,7 +171,7 @@ jobs:
         fi
         
         # 设置语言环境变量
-        export LANGUAGE="${{ secrets.LANGUAGE }}"
+        export LANGUAGE="${{ vars.LANGUAGE }}"
         if [ -z "$LANGUAGE" ]; then
           LANGUAGE="Chinese"
         fi
