@@ -41,13 +41,9 @@ jobs:
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
         export TOKEN_GITHUB=${{ secrets.TOKEN_GITHUB }}
-        echo "debug by rui123672"
         export LANGUAGE="${{ secrets.LANGUAGE }}"
-        echo "LANGUAGE:${LANGUAGE}"
         export CATEGORIES="${{ secrets.CATEGORIES }}"
-        echo "CATEGORIES:${CATEGORIES}"
         export MODEL_NAME="${{ secrets.MODEL_NAME }}"
-        echo "MODEL_NAME:${MODEL_NAME}"
         
         # 使用Scrapy爬取
         # Use Scrapy to crawl
@@ -111,8 +107,8 @@ jobs:
         cd ai
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
-        export LANGUAGE="${{ vars.LANGUAGE }}"
-        export MODEL_NAME="${{ vars.MODEL_NAME }}"
+        export LANGUAGE="${{ secrets.LANGUAGE }}"
+        export MODEL_NAME="${{ secrets.MODEL_NAME }}"
         
         python enhance.py --data ../data/${today}.jsonl
         
@@ -131,7 +127,7 @@ jobs:
         echo "转换为Markdown格式... / Converting to Markdown format..."
         
         # 设置环境变量 / Set environment variables
-        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export LANGUAGE="${{ secrets.LANGUAGE }}"
         
         cd to_md
         
@@ -241,8 +237,8 @@ jobs:
     - name: Commit code changes to main branch
       if: steps.dedup_check.outputs.has_new_content == 'true'
       run: |
-        git config --global user.email "${{ vars.EMAIL }}"
-        git config --global user.name "${{ vars.NAME }}"
+        git config --global user.email "${{ secrets.EMAIL }}"
+        git config --global user.name "${{ secrets.NAME }}"
         
         # 添加所有代码文件，但排除数据文件 / Add all code files, but exclude data files
         git add js/data-config.js
@@ -302,8 +298,8 @@ jobs:
     - name: Setup and commit to data branch
       if: steps.dedup_check.outputs.has_new_content == 'true'
       run: |
-        git config --global user.email "${{ vars.EMAIL }}"
-        git config --global user.name "${{ vars.NAME }}"
+        git config --global user.email "${{ secrets.EMAIL }}"
+        git config --global user.name "${{ secrets.NAME }}"
         
         echo "设置 data 分支... / Setting up data branch..."
         today=${{ steps.crawl_step.outputs.crawl_date }}
