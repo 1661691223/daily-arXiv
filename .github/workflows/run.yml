@@ -41,8 +41,8 @@ jobs:
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
         export TOKEN_GITHUB=${{ secrets.TOKEN_GITHUB }}
-        export LANGUAGE="${{ vars.LANGUAGE }}"
-        export CATEGORIES="${{ vars.CATEGORIES }}"
+        export LANGUAGE="${{ secrets.LANGUAGE }}"
+        export CATEGORIES="${{ secrets.CATEGORIES }}"
         export MODEL_NAME="${{ secrets.MODEL_NAME }}"
         
         # 使用Scrapy爬取
@@ -107,7 +107,7 @@ jobs:
         cd ai
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
-        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export LANGUAGE="${{ secrets.LANGUAGE }}"
         export MODEL_NAME="${{ secrets.MODEL_NAME }}"
         
         python enhance.py --data ../data/${today}.jsonl
@@ -127,7 +127,7 @@ jobs:
         echo "转换为Markdown格式... / Converting to Markdown format..."
         
         # 设置环境变量 / Set environment variables
-        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export LANGUAGE="${{ secrets.LANGUAGE }}"
         
         cd to_md
         
@@ -164,14 +164,14 @@ jobs:
         echo "生成热点趋势数据... / Generating trending data..."
         
         # 获取热点关键词配置（如果未设置则使用默认值）
-        TRENDING_KEYWORDS="${{ vars.TRENDING_KEYWORDS }}"
+        TRENDING_KEYWORDS="${{ secrets.TRENDING_KEYWORDS }}"
         if [ -z "$TRENDING_KEYWORDS" ]; then
           TRENDING_KEYWORDS="agent,diffusion,transformer,llm"
           echo "⚠️  TRENDING_KEYWORDS not set, using default: $TRENDING_KEYWORDS"
         fi
         
         # 设置语言环境变量
-        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export LANGUAGE="${{ secrets.LANGUAGE }}"
         if [ -z "$LANGUAGE" ]; then
           LANGUAGE="Chinese"
         fi
@@ -241,7 +241,7 @@ jobs:
         echo "注入热点关键词配置... / Injecting trending keywords config..."
         
         # 获取热点关键词配置（如果未设置则使用默认值）
-        TRENDING_KEYWORDS="${{ vars.TRENDING_KEYWORDS }}"
+        TRENDING_KEYWORDS="${{ secrets.TRENDING_KEYWORDS }}"
         if [ -z "$TRENDING_KEYWORDS" ]; then
           TRENDING_KEYWORDS="agent,diffusion,transformer,llm"
           echo "⚠️  TRENDING_KEYWORDS not set, using default: $TRENDING_KEYWORDS"
