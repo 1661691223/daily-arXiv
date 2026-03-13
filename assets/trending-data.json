@@ -2,9 +2,9 @@
   "keywords": [
     {
       "keyword": "agent",
-      "totalCount": 16,
+      "totalCount": 15,
       "dailyCounts": [
-        16
+        15
       ],
       "dates": [
         "2026-03-13"
@@ -13,7 +13,7 @@
       "trendType": "stable"
     },
     {
-      "keyword": "diffusion",
+      "keyword": "大模型发展报告",
       "totalCount": 0,
       "dailyCounts": [
         0
@@ -23,32 +23,8 @@
       ],
       "changePercent": 0.0,
       "trendType": "stable"
-    },
-    {
-      "keyword": "transformer",
-      "totalCount": 1,
-      "dailyCounts": [
-        1
-      ],
-      "dates": [
-        "2026-03-13"
-      ],
-      "changePercent": 0.0,
-      "trendType": "stable"
-    },
-    {
-      "keyword": "llm",
-      "totalCount": 19,
-      "dailyCounts": [
-        19
-      ],
-      "dates": [
-        "2026-03-13"
-      ],
-      "changePercent": 0.0,
-      "trendType": "stable"
     }
   ],
-  "generatedAt": "2026-03-13T09:33:38.315128Z",
+  "generatedAt": "2026-03-13T10:21:29.405824Z",
   "daysAnalyzed": 1
 }
