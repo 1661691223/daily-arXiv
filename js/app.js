@@ -1,3 +1,6 @@
+let trendingData = {}; // 存储热点趋势数据
+let trendingCollapsed = false; // 热点面板是否收起
+
 let currentDate = '';
 let availableDates = [];
 let currentView = 'grid'; // 'grid' 或 'list'
@@ -33,7 +36,6 @@ function loadUserKeywords() {
     activeKeywords = [];
   }
   
-  // renderKeywordTags();
   renderFilterTags();
 }
 
@@ -168,7 +170,6 @@ function toggleKeywordFilter(keyword) {
   renderPapers();
 }
 
-
 // 切换作者过滤
 function toggleAuthorFilter(author) {
   const index = activeAuthors.indexOf(author);
@@ -218,11 +219,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // 加载用户作者
   loadUserAuthors();
   
+  // 加载热点面板状态
+  loadTrendingState();
+  
+  // 添加热点面板切换事件
+  const trendingToggle = document.getElementById('trendingToggle');
+  const trendingHeader = document.querySelector('.trending-header');
+  if (trendingToggle && trendingHeader) {
+    trendingHeader.addEventListener('click', toggleTrendingPanel);
+  }
+  
   fetchAvailableDates().then(() => {
     if (availableDates.length > 0) {
       loadPapersByDate(availableDates[0]);
     }
   });
+  
+  // 加载热点趋势数据（独立于论文数据加载）
+  loadTrendingData();
 });
 
 async function fetchGitHubStats() {
@@ -1055,84 +1069,6 @@ function renderPapers() {
     }
   }
   
-  // 关键词和作者匹配，但不过滤，只排序
-  if (activeKeywords.length > 0 || activeAuthors.length > 0) {
-    // 对论文进行排序，将匹配的论文放在前面
-    filteredPapers.sort((a, b) => {
-      const aMatchesKeyword = activeKeywords.length > 0 ? 
-        activeKeywords.some(keyword => {
-          // 仅在标题和摘要中搜索关键词
-          const searchText = `${a.title} ${a.summary}`.toLowerCase();
-          return searchText.includes(keyword.toLowerCase());
-        }) : false;
-        
-      const aMatchesAuthor = activeAuthors.length > 0 ?
-        activeAuthors.some(author => {
-          // 仅在作者中搜索作者名
-          return a.authors.toLowerCase().includes(author.toLowerCase());
-        }) : false;
-        
-      const bMatchesKeyword = activeKeywords.length > 0 ?
-        activeKeywords.some(keyword => {
-          // 仅在标题和摘要中搜索关键词
-          const searchText = `${b.title} ${b.summary}`.toLowerCase();
-          return searchText.includes(keyword.toLowerCase());
-        }) : false;
-        
-      const bMatchesAuthor = activeAuthors.length > 0 ?
-        activeAuthors.some(author => {
-          // 仅在作者中搜索作者名
-          return b.authors.toLowerCase().includes(author.toLowerCase());
-        }) : false;
-      
-      // a和b的匹配状态（关键词或作者匹配都算）
-      const aMatches = aMatchesKeyword || aMatchesAuthor;
-      const bMatches = bMatchesKeyword || bMatchesAuthor;
-      
-      if (aMatches && !bMatches) return -1;
-      if (!aMatches && bMatches) return 1;
-      return 0;
-    });
-    
-    // 标记匹配的论文
-    filteredPapers.forEach(paper => {
-      const matchesKeyword = activeKeywords.length > 0 ?
-        activeKeywords.some(keyword => {
-          const searchText = `${paper.title} ${paper.summary}`.toLowerCase();
-          return searchText.includes(keyword.toLowerCase());
-        }) : false;
-        
-      const matchesAuthor = activeAuthors.length > 0 ?
-        activeAuthors.some(author => {
-          return paper.authors.toLowerCase().includes(author.toLowerCase());
-        }) : false;
-        
-      // 添加匹配标记（用于后续高亮整个论文卡片）
-      paper.isMatched = matchesKeyword || matchesAuthor;
-      
-      // 添加匹配原因（用于显示匹配提示）
-      if (paper.isMatched) {
-        paper.matchReason = [];
-        if (matchesKeyword) {
-          const matchedKeywords = activeKeywords.filter(keyword => 
-            `${paper.title} ${paper.summary}`.toLowerCase().includes(keyword.toLowerCase())
-          );
-          if (matchedKeywords.length > 0) {
-            paper.matchReason.push(`关键词: ${matchedKeywords.join(', ')}`);
-          }
-        }
-        if (matchesAuthor) {
-          const matchedAuthors = activeAuthors.filter(author => 
-            paper.authors.toLowerCase().includes(author.toLowerCase())
-          );
-          if (matchedAuthors.length > 0) {
-            paper.matchReason.push(`作者: ${matchedAuthors.join(', ')}`);
-          }
-        }
-      }
-    });
-  }
-  
   // 存储当前过滤后的论文列表，用于箭头键导航
   currentFilteredPapers = [...filteredPapers];
   
@@ -1546,7 +1482,7 @@ async function loadPapersByDateRange(startDate, endDate) {
 // 清除所有激活的关键词
 function clearAllKeywords() {
   activeKeywords = [];
-  // renderKeywordTags();
+  renderFilterTags();
   // 重新渲染论文列表，移除关键词匹配的高亮和优先排序
   renderPapers();
 }
@@ -1595,4 +1531,205 @@ function togglePdfSize(button) {
       togglePdfSize(button);
     });
   }
+}
+
+/**
+ * 加载热点面板状态
+ */
+function loadTrendingState() {
+  const savedState = localStorage.getItem(TRENDING_CONFIG.storageKey);
+  if (savedState === 'true') {
+    trendingCollapsed = true;
+    document.getElementById('trendingPanel')?.classList.add('collapsed');
+  }
+}
+
+/**
+ * 切换热点面板展开/收起状态
+ */
+function toggleTrendingPanel() {
+  trendingCollapsed = !trendingCollapsed;
+  const panel = document.getElementById('trendingPanel');
+  
+  if (trendingCollapsed) {
+    panel.classList.add('collapsed');
+    localStorage.setItem(TRENDING_CONFIG.storageKey, 'true');
+  } else {
+    panel.classList.remove('collapsed');
+    localStorage.setItem(TRENDING_CONFIG.storageKey, 'false');
+  }
+}
+
+/**
+ * 加载热点趋势数据（从预生成的 JSON 文件）
+ * Load trending data from pre-generated JSON file
+ */
+async function loadTrendingData() {
+  try {
+    const response = await fetch(TRENDING_CONFIG.getDataUrl());
+    
+    if (!response.ok) {
+      console.error('加载热点数据失败 / Failed to load trending data:', response.status);
+      renderTrendingEmpty();
+      return;
+    }
+    
+    const data = await response.json();
+    
+    // 检查数据有效性
+    if (!data || !data.keywords || data.keywords.length === 0) {
+      console.warn('热点数据为空 / Trending data is empty');
+      renderTrendingEmpty();
+      return;
+    }
+    
+    // 将数据转换为旧格式以兼容现有渲染逻辑
+    trendingData = {};
+    data.keywords.forEach(item => {
+      trendingData[item.keyword] = item;
+    });
+    
+    console.log(`✓ 加载了 ${data.keywords.length} 个热点关键词 / Loaded ${data.keywords.length} trending keywords`);
+    renderTrendingCards();
+    
+  } catch (error) {
+    console.error('加载热点数据失败 / Failed to load trending data:', error);
+    renderTrendingEmpty();
+  }
+}
+
+/**
+ * 渲染热点卡片
+ */
+function renderTrendingCards() {
+  const content = document.getElementById('trendingContent');
+  
+  if (Object.keys(trendingData).length === 0) {
+    renderTrendingEmpty();
+    return;
+  }
+  
+  // 按总数排序
+  const sortedKeywords = Object.values(trendingData).sort((a, b) => b.totalCount - a.totalCount);
+  
+  const grid = document.createElement('div');
+  grid.className = 'trending-grid';
+  
+  sortedKeywords.forEach(trend => {
+    const card = createTrendingCard(trend);
+    grid.appendChild(card);
+  });
+  
+  content.innerHTML = '';
+  content.appendChild(grid);
+}
+
+/**
+ * 创建单个热点卡片
+ */
+function createTrendingCard(trend) {
+  const card = document.createElement('div');
+  card.className = 'trending-card';
+  
+  // 使用预计算的趋势类型和变化百分比
+  const trendType = trend.trendType || 'stable';
+  const changePercent = trend.changePercent || 0;
+  
+  // 确定趋势图标和文本
+  let trendIcon = '→';
+  let trendText = '持平';
+  
+  if (trendType === 'rising') {
+    trendIcon = '↑';
+    trendText = '上升';
+  } else if (trendType === 'falling') {
+    trendIcon = '↓';
+    trendText = '下降';
+  }
+  
+  // 热度徽章
+  let badge = '';
+  if (trend.totalCount > 50) {
+    badge = '<span class="trending-badge hot">🔥 热门</span>';
+  } else if (trendType === 'rising') {
+    badge = '<span class="trending-badge rising">📈 上升</span>';
+  } else if (trendType === 'stable') {
+    badge = '<span class="trending-badge stable">➡️ 稳定</span>';
+  } else {
+    badge = '<span class="trending-badge falling">📉 下降</span>';
+  }
+  
+  // 生成柱状图
+  const counts = trend.dailyCounts || [];
+  const maxCount = counts.length > 0 ? Math.max(...counts) : 0;
+  const bars = counts.map((count, index) => {
+    const height = maxCount > 0 ? (count / maxCount * 100) : 0;
+    const date = trend.dates[index];
+    return `
+      <div class="trending-bar" style="height: ${height}%">
+        <div class="trending-bar-tooltip">${date}: ${count} 篇</div>
+      </div>
+    `;
+  }).join('');
+  
+  // 日期标签
+  const dateLabels = trend.dates.length > 0 ? `
+    <div class="trending-dates">
+      <span>${formatDate(trend.dates[0])}</span>
+      <span>${formatDate(trend.dates[trend.dates.length - 1])}</span>
+    </div>
+  ` : '';
+  
+  // 变化趋势
+  const changeClass = changePercent > 0 ? 'positive' : changePercent < 0 ? 'negative' : 'neutral';
+  const changeDisplay = Math.abs(changePercent).toFixed(1);
+  
+  card.innerHTML = `
+    <div class="trending-card-header">
+      <div class="trending-keyword">
+        <span>${trend.keyword}</span>
+      </div>
+      ${badge}
+    </div>
+    <div class="trending-count">${trend.totalCount} 篇论文</div>
+    <div class="trending-chart">
+      <div class="trending-bars">${bars}</div>
+    </div>
+    ${dateLabels}
+    <div class="trending-change ${changeClass}">
+      <span>${trendIcon}</span>
+      <span>${trendText} ${changeDisplay}%</span>
+    </div>
+  `;
+  
+  // 点击卡片时，将关键词添加到过滤器
+  card.addEventListener('click', () => {
+    const keyword = trend.keyword;
+    if (!userKeywords.includes(keyword)) {
+      userKeywords.push(keyword);
+      activeKeywords.push(keyword);
+      localStorage.setItem('preferredKeywords', JSON.stringify(userKeywords));
+      renderFilterTags();
+      renderPapers();
+    } else if (!activeKeywords.includes(keyword)) {
+      toggleKeywordFilter(keyword);
+    }
+  });
+  
+  return card;
+}
+
+/**
+ * 渲染空状态
+ */
+function renderTrendingEmpty() {
+  const content = document.getElementById('trendingContent');
+  content.innerHTML = `
+    <div class="trending-empty">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L3 14h8l-1 8 10-12h-8l1-8z" fill="currentColor" opacity="0.3"/>
+      </svg>
+      <p>暂无热点数据 / No trending data available</p>
+    </div>
+  `;
 }

@@ -157,6 +157,50 @@ jobs:
         ls data/*.jsonl | sed 's|data/||' > assets/file-list.txt
         echo "文件列表更新完成 / File list updated"
 
+    - name: Generate trending data
+      if: steps.dedup_check.outputs.has_new_content == 'true'
+      run: |
+        source .venv/bin/activate
+        echo "生成热点趋势数据... / Generating trending data..."
+        
+        # 获取热点关键词配置（如果未设置则使用默认值）
+        TRENDING_KEYWORDS="${{ vars.TRENDING_KEYWORDS }}"
+        if [ -z "$TRENDING_KEYWORDS" ]; then
+          TRENDING_KEYWORDS="agent,diffusion,transformer,llm"
+          echo "⚠️  TRENDING_KEYWORDS not set, using default: $TRENDING_KEYWORDS"
+        fi
+        
+        # 设置语言环境变量
+        export LANGUAGE="${{ secrets.LANGUAGE }}"
+        if [ -z "$LANGUAGE" ]; then
+          LANGUAGE="Chinese"
+        fi
+        
+        echo "热点关键词: $TRENDING_KEYWORDS / Trending keywords: $TRENDING_KEYWORDS"
+        echo "语言: $LANGUAGE / Language: $LANGUAGE"
+        
+        # 调用 Python 脚本生成趋势数据
+        cd ai
+        python generate_trending.py \
+          --keywords "$TRENDING_KEYWORDS" \
+          --days 7 \
+          --data-dir ../data \
+          --output ../assets/trending-data.json \
+          --language "$LANGUAGE"
+        
+        # 检查生成是否成功
+        if [ $? -ne 0 ]; then
+          echo "❌ 趋势数据生成失败 / Trending data generation failed"
+          exit 1
+        fi
+        
+        if [ ! -f "../assets/trending-data.json" ]; then
+          echo "❌ 趋势数据文件未生成 / Trending data file not generated"
+          exit 1
+        fi
+        
+        echo "✅ 趋势数据生成完成 / Trending data generation completed"
+
     - name: Generate password hash and inject into config
       if: steps.dedup_check.outputs.has_new_content == 'true'
       run: |
@@ -190,6 +234,40 @@ jobs:
         fi
 
         echo "🔐 Authentication setup complete"
+
+    - name: Inject trending keywords config
+      if: steps.dedup_check.outputs.has_new_content == 'true'
+      run: |
+        echo "注入热点关键词配置... / Injecting trending keywords config..."
+        
+        # 获取热点关键词配置（如果未设置则使用默认值）
+        TRENDING_KEYWORDS="${{ vars.TRENDING_KEYWORDS }}"
+        if [ -z "$TRENDING_KEYWORDS" ]; then
+          TRENDING_KEYWORDS="agent,diffusion,transformer,llm"
+          echo "⚠️  TRENDING_KEYWORDS not set, using default: $TRENDING_KEYWORDS"
+        fi
+        
+        echo "热点关键词: $TRENDING_KEYWORDS / Trending keywords: $TRENDING_KEYWORDS"
+        
+        # 注入到 trending-config.js
+        if [ -f "js/trending-config.js" ]; then
+          # 将逗号分隔的字符串转换为 JSON 数组格式
+          KEYWORDS_JSON=$(echo "$TRENDING_KEYWORDS" | awk -F',' '{
+            printf "["
+            for(i=1; i<=NF; i++) {
+              gsub(/^[ \t]+|[ \t]+$/, "", $i)
+              if(i>1) printf ","
+              printf "\"%s\"", $i
+            }
+            printf "]"
+          }')
+          
+          sed -i "s/PLACEHOLDER_TRENDING_KEYWORDS/$KEYWORDS_JSON/g" js/trending-config.js
+          echo "✅ 热点关键词已注入到 js/trending-config.js / Trending keywords injected into js/trending-config.js"
+        else
+          echo "❌ ERROR: js/trending-config.js not found!"
+          exit 1
+        fi
 
     - name: Summary
       run: |
@@ -242,17 +320,18 @@ jobs:
         
         # 添加所有代码文件，但排除数据文件 / Add all code files, but exclude data files
         git add js/data-config.js
+        git add js/trending-config.js
         git add .github/
-        # 添加其他可能的代码变更，但排除 data/ 目录和 assets/file-list.txt
-        # Add other possible code changes, but exclude data/ directory and assets/file-list.txt
+        # 添加其他可能的代码变更，但排除 data/ 目录和 assets/ 目录中的数据文件
+        # Add other possible code changes, but exclude data/ directory and data files in assets/
         git add -A
-        git reset -- data/* assets/file-list.txt 2>/dev/null || true
+        git reset -- data/* assets/file-list.txt assets/trending-data.json 2>/dev/null || true
         
         # 检查是否有代码变更需要提交 / Check if there are code changes to commit
         if git diff --staged --quiet; then
           echo "没有代码变更需要提交 / No code changes to commit"
         else
-          git commit -m "chore: update data-config.js with repository info"
+          git commit -m "chore: update configs and trending data"
           echo "代码变更已提交到 main 分支 / Code changes committed to main branch"
         fi
 
@@ -292,6 +371,7 @@ jobs:
         # 复制数据文件到临时目录 / Copy data files to temporary directory
         cp -r data/* /tmp/data_files/data/ 2>/dev/null || true
         cp assets/file-list.txt /tmp/data_files/assets/ 2>/dev/null || true
+        cp assets/trending-data.json /tmp/data_files/assets/ 2>/dev/null || true
         
         echo "数据文件已保存到临时目录 / Data files saved to temporary directory"
 
@@ -311,6 +391,7 @@ jobs:
         rm -rf data/*.jsonl 2>/dev/null || true
         rm -f data/*.md 2>/dev/null || true
         rm -f assets/file-list.txt 2>/dev/null || true
+        rm -f assets/trending-data.json 2>/dev/null || true
         
         # 检查 data 分支是否存在 / Check if data branch exists
         if git ls-remote --heads origin data | grep -q data; then
@@ -336,10 +417,12 @@ jobs:
         mkdir -p data assets
         cp -r /tmp/data_files/data/* data/ 2>/dev/null || true
         cp /tmp/data_files/assets/file-list.txt assets/ 2>/dev/null || true
+        cp /tmp/data_files/assets/trending-data.json assets/ 2>/dev/null || true
         
         # 只添加数据文件 / Only add data files
         git add data/* 2>/dev/null || true
         git add assets/file-list.txt 2>/dev/null || true
+        git add assets/trending-data.json 2>/dev/null || true
         
         # 检查是否有数据变更需要提交 / Check if there are data changes to commit
         if git diff --staged --quiet; then
@@ -371,3 +454,4 @@ jobs:
             fi
           fi
         done
+

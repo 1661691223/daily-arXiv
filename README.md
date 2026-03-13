@@ -53,9 +53,32 @@ Otherwise, you can directly use this repo in https://dw-dengwei.github.io/daily-
    3. `MODEL_NAME`: such as "deepseek-chat"
    4. `EMAIL`: your email for push to GitHub
    5. `NAME`: your name for push to GitHub
+   6. `TRENDING_KEYWORDS` (Optional): comma-separated keywords for trending analysis, such as "agent,diffusion,transformer,llm". If not set, default keywords will be used.
 8. Go to your-own-repo -> Actions -> arXiv-daily-ai-enhanced
 9. You can manually click **Run workflow** to test if it works well (it may take about one hour). By default, this action will automatically run every day. You can modify it in `.github/workflows/run.yml`
 10. Set up GitHub pages: Go to your own repo -> Settings -> Pages. In `Build and deployment`, set `Source="Deploy from a branch"`, `Branch="main", "/(root)"`. Wait for a few minutes, go to https://\<username\>.github.io/daily-arXiv-ai-enhanced/. Please see this [issue](https://github.com/dw-dengwei/daily-arXiv-ai-enhanced/issues/14) for more precise instructions.
+
+## 🔥 Trending Topics Feature
+
+The website now includes a **Trending Topics** panel that displays hot keywords and their trends over the past 7 days. This feature helps you quickly identify popular research areas.
+
+**Features:**
+- 📊 Automatic analysis of keyword occurrences in recent papers
+- 📈 Trend visualization with daily statistics
+- 🎯 One-click filtering by clicking on trending keywords
+- 🔄 Expandable/collapsible panel (state saved locally)
+
+**Configuration:**
+The trending keywords are controlled by the `TRENDING_KEYWORDS` environment variable in GitHub Actions. If not configured, the default keywords are: `agent`, `diffusion`, `transformer`, `llm`.
+
+**Local Testing:**
+To test the trending data generation locally:
+```bash
+cd ai
+python generate_trending.py --keywords "agent,diffusion,transformer" --days 7
+```
+
+This will generate `assets/trending-data.json` which will be committed to the data branch and automatically loaded by the frontend from there.
 
 # Plans
 See https://github.com/users/dw-dengwei/projects/3
