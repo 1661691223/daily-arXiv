@@ -1,7 +1,6 @@
 arxiv:
   categories:  # 文章类型
-    - cs.CV
-    - cs.CL
+    - cs.AI
 
 llm:
   model_name: 'stepfun/step-3.5-flash:free'  # 使用的LLM模型
