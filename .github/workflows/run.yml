@@ -46,9 +46,9 @@ jobs:
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
         export TOKEN_GITHUB=${{ secrets.TOKEN_GITHUB }}
-        export LANGUAGE="${{ secrets.LANGUAGE }}"
-        export CATEGORIES="${{ secrets.CATEGORIES }}"
-        export MODEL_NAME="${{ secrets.MODEL_NAME }}"
+        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export CATEGORIES="${{ vars.CATEGORIES }}"
+        export MODEL_NAME="${{ vars.MODEL_NAME }}"
         
         # 使用Scrapy爬取
         # Use Scrapy to crawl
@@ -112,8 +112,8 @@ jobs:
         cd ai
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
-        export LANGUAGE="${{ secrets.LANGUAGE }}"
-        export MODEL_NAME="${{ secrets.MODEL_NAME }}"
+        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export MODEL_NAME="${{ vars.MODEL_NAME }}"
         
         python enhance.py --data ../data/${today}.jsonl
         
