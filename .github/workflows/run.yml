@@ -5,7 +5,7 @@ name: arXiv-daily-ai-enhanced
 
 on:
   schedule:
-    - cron: "30 1 * * *"
+    - cron: "0 1 * * *"
   workflow_dispatch:
 
 
@@ -15,6 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Set timezone to China Standard Time
+      run: sudo timedatectl set-timezone Asia/Shanghai
+    - name: Check current time
+      run: date "+%Y-%m-%d %H:%M:%S %Z"
+
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
@@ -41,9 +46,9 @@ jobs:
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
         export TOKEN_GITHUB=${{ secrets.TOKEN_GITHUB }}
-        export LANGUAGE="${{ secrets.LANGUAGE }}"
-        export CATEGORIES="${{ secrets.CATEGORIES }}"
-        export MODEL_NAME="${{ secrets.MODEL_NAME }}"
+        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export CATEGORIES="${{ vars.CATEGORIES }}"
+        export MODEL_NAME="${{ vars.MODEL_NAME }}"
         
         # 使用Scrapy爬取
         # Use Scrapy to crawl
@@ -107,8 +112,8 @@ jobs:
         cd ai
         export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
         export OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }}
-        export LANGUAGE="${{ secrets.LANGUAGE }}"
-        export MODEL_NAME="${{ secrets.MODEL_NAME }}"
+        export LANGUAGE="${{ vars.LANGUAGE }}"
+        export MODEL_NAME="${{ vars.MODEL_NAME }}"
         
         python enhance.py --data ../data/${today}.jsonl
         
@@ -164,7 +169,7 @@ jobs:
         echo "生成热点趋势数据... / Generating trending data..."
         
         # 获取热点关键词配置（如果未设置则使用默认值）
-        TRENDING_KEYWORDS="${{ vars.TRENDING_KEYWORDS }}"
+        TRENDING_KEYWORDS="${{ secrets.TRENDING_KEYWORDS }}"
         if [ -z "$TRENDING_KEYWORDS" ]; then
           TRENDING_KEYWORDS="agent,diffusion,transformer,llm"
           echo "⚠️  TRENDING_KEYWORDS not set, using default: $TRENDING_KEYWORDS"
@@ -241,7 +246,7 @@ jobs:
         echo "注入热点关键词配置... / Injecting trending keywords config..."
         
         # 获取热点关键词配置（如果未设置则使用默认值）
-        TRENDING_KEYWORDS="${{ vars.TRENDING_KEYWORDS }}"
+        TRENDING_KEYWORDS="${{ secrets.TRENDING_KEYWORDS }}"
         if [ -z "$TRENDING_KEYWORDS" ]; then
           TRENDING_KEYWORDS="agent,diffusion,transformer,llm"
           echo "⚠️  TRENDING_KEYWORDS not set, using default: $TRENDING_KEYWORDS"
