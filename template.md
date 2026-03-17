@@ -39,4 +39,4 @@ You can modify it in `.github/workflows/run.yml`
 
 # Star history
 
-[![Star History Chart](https://api.star-history.com/svg?repos=dw-dengwei/daily-arXiv-ai-enhanced&type=Date)](https://www.star-history.com/#dw-dengwei/daily-arXiv-ai-enhanced&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=1661691223/daily-arXiv&type=Date)](https://www.star-history.com/#1661691223/daily-arXiv&Date)
