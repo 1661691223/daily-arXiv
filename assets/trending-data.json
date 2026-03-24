@@ -2,12 +2,12 @@
   "keywords": [
     {
       "keyword": "agent",
-      "totalCount": 25,
+      "totalCount": 50,
       "dailyCounts": [
-        25
+        50
       ],
       "dates": [
-        "2026-03-23"
+        "2026-03-24"
       ],
       "changePercent": 0.0,
       "trendType": "stable"
@@ -19,12 +19,12 @@
         0
       ],
       "dates": [
-        "2026-03-23"
+        "2026-03-24"
       ],
       "changePercent": 0.0,
       "trendType": "stable"
     }
   ],
-  "generatedAt": "2026-03-23T05:30:42.805498Z",
+  "generatedAt": "2026-03-24T05:42:19.923374Z",
   "daysAnalyzed": 1
 }
