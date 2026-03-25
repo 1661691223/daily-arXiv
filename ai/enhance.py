@@ -1,6 +1,7 @@
 import os
 import json
 import sys
+import time
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict
@@ -125,11 +126,23 @@ def process_single_item(chain, item: Dict, language: str) -> Dict:
     }
     
     try:
-        response: Structure = chain.invoke({
-            "language": language,
-            "content": item['summary']
-        })
-        item['AI'] = response.model_dump()
+        MAX_RETRIES = 20
+        for attempt in range(MAX_RETRIES):
+            response: Structure = chain.invoke({
+                "language": language,
+                "content": item['summary']
+            })
+            
+            # 检查 response 是否有效 (假设为空的判断逻辑是 if not response)
+            if response:
+                item['AI'] = response.model_dump()
+                break  # 成功获取数据，跳出重试循环
+            print(f"Attempt {attempt + 1} failed, retrying...")
+            time.sleep(3)
+        else:
+            # 这里的代码只有在 for 循环完整执行完（即 3 次都失败且没触发 break）时才会运行
+            print(f"Failed to get response after {MAX_RETRIES} attempts for item: {item.get('id')}")
+            item['AI'] = None # 或者设置一个默认值
     except langchain_core.exceptions.OutputParserException as e:
         # 尝试从错误信息中提取 JSON 字符串并修复
         error_msg = str(e)
