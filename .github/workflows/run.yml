@@ -170,7 +170,7 @@ jobs:
         echo "生成热点趋势数据... / Generating trending data..."
         
         # 获取热点关键词配置（如果未设置则使用默认值）
-        TRENDING_KEYWORDS="${{ secrets.TRENDING_KEYWORDS }}"
+        TRENDING_KEYWORDS="${{ vars.TRENDING_KEYWORDS }}"
         if [ -z "$TRENDING_KEYWORDS" ]; then
           TRENDING_KEYWORDS="agent,diffusion,transformer,llm"
           echo "⚠️  TRENDING_KEYWORDS not set, using default: $TRENDING_KEYWORDS"
