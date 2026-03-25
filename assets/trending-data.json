@@ -2,9 +2,9 @@
   "keywords": [
     {
       "keyword": "agent",
-      "totalCount": 9,
+      "totalCount": 21,
       "dailyCounts": [
-        9
+        21
       ],
       "dates": [
         "2026-03-25"
@@ -13,10 +13,10 @@
       "trendType": "stable"
     },
     {
-      "keyword": "大模型发展报告",
-      "totalCount": 0,
+      "keyword": "llm",
+      "totalCount": 77,
       "dailyCounts": [
-        0
+        77
       ],
       "dates": [
         "2026-03-25"
@@ -25,6 +25,6 @@
       "trendType": "stable"
     }
   ],
-  "generatedAt": "2026-03-25T05:44:23.719465Z",
+  "generatedAt": "2026-03-25T10:21:49.737250Z",
   "daysAnalyzed": 1
 }
