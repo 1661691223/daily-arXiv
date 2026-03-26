@@ -2,29 +2,29 @@
   "keywords": [
     {
       "keyword": "agent",
-      "totalCount": 21,
+      "totalCount": 37,
       "dailyCounts": [
-        21
+        37
       ],
       "dates": [
-        "2026-03-25"
+        "2026-03-26"
       ],
       "changePercent": 0.0,
       "trendType": "stable"
     },
     {
       "keyword": "llm",
-      "totalCount": 77,
+      "totalCount": 66,
       "dailyCounts": [
-        77
+        66
       ],
       "dates": [
-        "2026-03-25"
+        "2026-03-26"
       ],
       "changePercent": 0.0,
       "trendType": "stable"
     }
   ],
-  "generatedAt": "2026-03-25T10:21:49.737250Z",
+  "generatedAt": "2026-03-26T05:16:09.555553Z",
   "daysAnalyzed": 1
 }
