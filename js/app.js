@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchGitHubStats() {
   try {
-    const response = await fetch('https://api.github.com/repos/1661691223/daily-arXiv');
+    const response = await fetch(DATA_CONFIG.getRepoApiUrl());
     const data = await response.json();
     const starCount = data.stargazers_count;
     const forkCount = data.forks_count;
