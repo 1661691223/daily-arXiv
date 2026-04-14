@@ -37,27 +37,26 @@ def parse_args():
 
 def process_single_item(chain, item: Dict, language: str) -> Dict:
     def is_sensitive(content: str) -> bool:
-        """
-        调用 spam.dw-dengwei.workers.dev 接口检测内容是否包含敏感词。
-        返回 True 表示触发敏感词，False 表示未触发。
-        """
-        try:
-            resp = requests.post(
-                "https://spam.dw-dengwei.workers.dev",
-                json={"text": content},
-                timeout=5
-            )
-            if resp.status_code == 200:
-                result = resp.json()
-                # 约定接口返回 {"sensitive": true/false, ...}
-                return result.get("sensitive", True)
-            else:
-                # 如果接口异常，默认不触发敏感词
-                print(f"Sensitive check failed with status {resp.status_code}", file=sys.stderr)
-                return True
-        except Exception as e:
-            print(f"Sensitive check error: {e}", file=sys.stderr)
-            return True
+        #"""
+        #调用 spam.dw-dengwei.workers.dev 接口检测内容是否包含敏感词。
+        #返回 True 表示触发敏感词，False 表示未触发。
+        #"""
+        #try:
+        #    resp = requests.post(
+        #        "https://spam.dw-dengwei.workers.dev",
+        #        json={"text": content},
+        #        timeout=5
+        #    )
+        #    if resp.status_code == 200:
+        #        result = resp.json()
+        #        # 约定接口返回 {"sensitive": true/false, ...}
+        #        return result.get("sensitive", True)
+        #    else:
+        #        # 如果接口异常，默认不触发敏感词
+        #        print(f"Sensitive check failed with status {resp.status_code}", file=sys.stderr)
+        #        return True
+        #except Exception as e:
+        return False 
 
     def check_github_code(content: str) -> Dict:
         """提取并验证 GitHub 链接"""
@@ -127,6 +126,7 @@ def process_single_item(chain, item: Dict, language: str) -> Dict:
     
     try:
         MAX_RETRIES = 20
+        
         for attempt in range(MAX_RETRIES):
             response: Structure = chain.invoke({
                 "language": language,
@@ -153,7 +153,7 @@ def process_single_item(chain, item: Dict, language: str) -> Dict:
                 # 提取 JSON 字符串
                 json_str = error_msg.split("Function Structure arguments:", 1)[1].strip().split('are not valid JSON')[0].strip()
                 # 预处理 LaTeX 数学符号 - 使用四个反斜杠来确保正确转义
-                json_str = json_str.replace('\\', '\\\\')
+                json_str = json_str.replace('\\\\', '\\\\\\\\')
                 # 尝试解析修复后的 JSON
                 partial_data = json.loads(json_str)
             except Exception as json_e:
